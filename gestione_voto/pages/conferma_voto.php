@@ -1,14 +1,9 @@
 <?php
 require "connection.php";
-
 session_start();
 
-if (isset($_GET["id_candidato"]) && isset($_GET['selected_id_lista'])) {
-    $_SESSION['selected_id_candidato'] = $GET['id_candidato'];
-    $_SESSION['selected_id_lista'] = $GET['selected_id_lista'];
-} 
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +11,7 @@ if (isset($_GET["id_candidato"]) && isset($_GET['selected_id_lista'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selezione candidato</title>
+    <title>Conferma del voto</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -25,46 +20,51 @@ if (isset($_GET["id_candidato"]) && isset($_GET['selected_id_lista'])) {
     <div class="bg-blue-50 border border-blue-200 shadow-md w-full max-w-3xl p-6">
 
         <h1 class="text-2xl font-bold text-blue-800 text-center mb-6">
-            Selezione del candidato
+            Conferma del voto
         </h1>
 
         <div class="border border-blue-300 bg-white p-4 mb-4 text-gray-700 text-sm leading-relaxed text-center">
             <p>
-                La seconda fase del voto prevede la selezione del candidato
+                La terza fase ed ultima del voto consiste nella conferma della selezione
             </p>
         </div>
 
         <div class="border border-blue-300 bg-white p-4 mb-6 text-gray-700 text-sm leading-relaxed text-center">
             <p>
-                Scegli il candidato a cui assegnare il Suo voto dall'elenco a comparsa qui sotto.
+                Qui sotto è riepilogata la Sua scelta di voto.
             </p>
             <span class="block mt-2 text-gray-600">
                 <span class="text-xs">
-                    appena selezionatao il candidato, Le verrà proposta la conferma definitiva del voto.
+                    Confermando questa scelta Lei esprime in modo definitivo il Suo voto
                 </span>
             </span>
         </div>
 
+        <div class="border border-green-300 bg-green-50 p-6 rounded-lg text-center shadow-lg max-w-md mx-auto">
+            <p class="text-gray-700 mb-3">
+                <span class="font-semibold">Lista selezionata:</span> <?= $_SESSION["selected_nome_lista"] ?>
+            </p>
 
+            <p class="text-gray-700 mb-6">
+                <span class="font-semibold">Candidato selezionato:</span> <?= $SESSION["selected_nome_candidato"] ?>
+            </p>
 
-        <div class="border border-green-300 bg-green-50 p-6 mb-6 text-center">
-            <label for="lista" class="block text-sm font-semibold text-green-800 mb-2">
-                Lista dei Candidati
-            </label>
+            <div class="flex justify-center gap-4">
+                <form action="registrazione_effetuata.php" method="POST">
+                    <button type="submit"
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200">
+                        Conferma
+                    </button>
+                </form>
 
-            <select id="lista"
-                class="w-full border border-gray-300 rounded px-3 text-center py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
-                <option value="">-- Seleziona una lista --</option>
-                <?php
-                if ($result->num_rows > 0) {
-                    while ($row = mysqli_fetch_array($result)) {
-                        echo "<option value='" . $row['id_candidato'] . "'>" . $row['nome'] . $row['cognome'] . "</option>";
-                        $_SESSION['selected_id_candidato'] = $row['id_candidato'];
-                    }
-                }
-                ?>
-            </select>
+                <a href="../index.html"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg shadow transition duration-200">
+                    Annulla
+                </a>
+            </div>
         </div>
+
+
 
     </div>
 

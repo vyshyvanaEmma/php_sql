@@ -1,10 +1,16 @@
 <?php
+session_start();
+
 require "connection.php";
 
 $sql = "SELECT nome_lista from liste";
 $result = mysqli_query($connection, $sql);
 
-session_start();
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['selected_nome_lista'] = $_POST['nome_lista'];
+    header("Location: selezione_candidato.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -49,7 +55,7 @@ session_start();
                 Lista elettorale
             </label>
 
-            <form method="GET" action="selezione_candidato.php">
+            <form method="POST">
                 <select name="lista_id" onchange="this.form.submit()"
                     class="w-full border border-gray-300 rounded px-3 py-2 text-center">
 
@@ -57,8 +63,7 @@ session_start();
 
                     <?php
                     while ($row = $result->fetch_assoc()) {
-                        echo "<option value='" . $row['id'] . "'>" . $row['nome_lista'] . "</option>";
-                        $_SESSION['selected_id_lista'] = $row['id'];    
+                        echo "<option value='" . $row['nome_lista'] . "'>" . $row['nome_lista'] . "</option>";  
                     }
                     ?>
 

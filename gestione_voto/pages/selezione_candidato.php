@@ -1,10 +1,17 @@
 <?php
+session_start();
+
 require "connection.php";
 
-$sql = "SELECT nome, cognome from candidati";
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['selected_nome_candidato'] = $_POST['nome_completo'];
+    header("Location: selezione_candidato.php");
+    exit();
+}
+
+$sql = "SELECT id_candidato, nome, cognome from candidati";
 $result = mysqli_query($connection, $sql);
 
-session_start();
 ?>
 
 <!DOCTYPE html>
@@ -49,14 +56,15 @@ session_start();
                 Lista dei Candidati
             </label>
 
-            <form action="conferma_voto.php" method="GET">
+            <form method="POST">
                 <select name="id_candidato" id="lista" onchange="this.form.submit()"
                     class="w-full border border-gray-300 rounded px-3 text-center py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
                     <option value="">-- Seleziona una lista --</option>
                     <?php
                     if ($result->num_rows > 0) {
                         while ($row = mysqli_fetch_array($result)) {
-                            echo "<option value='" . $row['id_candidato'] . "'>" . $row['nome'] . $row['cognome'] . "</option>";
+                            $nome_completo = $row['nome'] . " " . $row['cognome'];
+                            echo "<option value='" . $nome_completo . "'>" . $row['nome'] . " " . $row['cognome'] . "</option>";
                         }
                     }
                     ?>
