@@ -46,7 +46,7 @@ session_start();
             </p>
 
             <p class="text-gray-700 mb-6">
-                <span class="font-semibold">Candidato selezionato:</span> <?= $SESSION["selected_nome_candidato"] ?>
+                <span class="font-semibold">Candidato selezionato:</span> <?= $_SESSION["selected_nome_candidato"] ?>
             </p>
 
             <div class="flex justify-center gap-4">
@@ -67,8 +67,6 @@ session_start();
 
 
     </div>
-
-
 
 </body>
 

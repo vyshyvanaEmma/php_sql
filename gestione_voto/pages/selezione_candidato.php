@@ -4,8 +4,8 @@ session_start();
 require "connection.php";
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['selected_nome_candidato'] = $_POST['nome_completo'];
-    header("Location: selezione_candidato.php");
+    $_SESSION['selected_nome_candidato'] = $_POST['id_candidato'];
+    header("Location: conferma_voto.php");
     exit();
 }
 

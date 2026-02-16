@@ -7,7 +7,7 @@ $sql = "SELECT nome_lista from liste";
 $result = mysqli_query($connection, $sql);
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['selected_nome_lista'] = $_POST['nome_lista'];
+    $_SESSION['selected_nome_lista'] = $_POST['lista_id'];
     header("Location: selezione_candidato.php");
     exit();
 }
