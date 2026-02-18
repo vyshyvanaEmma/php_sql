@@ -1,7 +1,11 @@
 <?php
 session_start();
 require "connection.php";
-
+$message = null;
+if(!$_SESSION['loggedIn']){
+    $message = 'Utente non è loggatto, quindi non puo inserire il prodotto';
+    header('elenco_ordini.php');
+}
 $orderNumber = isset($_SESSION['selected_ordine']) ? intval($_SESSION['selected_ordine']) : null;
 $selected_ordine = $orderNumber ? htmlspecialchars($orderNumber) : null;
 

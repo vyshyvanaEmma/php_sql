@@ -67,9 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php else: ?>
             <div class="p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded text-center">
                 <?php if ($customer_id): ?>
-                    Questo cliente non ha effettuato ordini.
+                    Questo cliente non ha effettuato ordini
                 <?php else: ?>
-                    Non ci sono ordini da mostrare.
+                    Non ci sono ordini da mostrare
                 <?php endif; ?>
             </div>
             <div class="mt-4 flex justify-center">
