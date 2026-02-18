@@ -1,7 +1,6 @@
 <?php
 session_start();
 require "connection.php";
-$message = null;
 
 if (!isset($_SESSION['loggedIn']) || $_SESSION['loggedIn'] !== true) {
     $_SESSION['message'] = 'Utente non è loggato, quindi non può inserire il prodotto';
@@ -9,55 +8,64 @@ if (!isset($_SESSION['loggedIn']) || $_SESSION['loggedIn'] !== true) {
     exit();
 }
 
-$orderNumber = isset($_SESSION['selected_ordine']) ? intval($_SESSION['selected_ordine']) : null;
-$selected_ordine = $orderNumber ? htmlspecialchars($orderNumber) : null;
+$selected_ordine = $_SESSION['selected_ordine'];
 
 $message = null;
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $prodotto_id = isset($_POST['prodotto_id']) ? $_POST['prodotto_id'] : '';
-    if (!$orderNumber) {
+    $prodotto_id = $_POST['prodotto_id'] ?? '';
+
+    if (!$selected_ordine) {
         $error = 'Nessun ordine selezionato.';
     } elseif (empty($prodotto_id)) {
         $error = 'Seleziona un prodotto.';
     } else {
-        $prodotto_id_esc = mysqli_real_escape_string($connection, $prodotto_id);
+        // Prendo prezzo
+        $q = "SELECT buyPrice FROM products WHERE productCode = '$prodotto_id'";
+        $res = mysqli_query($connection, $q);
+        $priceEach = 0;
+        if ($res && $row = mysqli_fetch_assoc($res)) {
+            $priceEach = (float)$row['buyPrice'];
+        }
 
-        // ottengo prezzo
-        $q = "SELECT buyPrice FROM products WHERE productCode = '{$prodotto_id_esc}' LIMIT 1";
-        $r = mysqli_query($connection, $q);
-        if ($r && $rowp = mysqli_fetch_assoc($r)) {
-            $priceEach = (float)$rowp['buyPrice'];
+        $check_ordine_gia_presente = "SELECT * FROM orderdetails WHERE orderNumber = $selected_ordine AND productCode = '$prodotto_id'";
+        $res_check = mysqli_query($connection, $check_ordine_gia_presente);
 
-            // calcolo prossimo orderLineNumber
-            $q2 = "SELECT COALESCE(MAX(orderLineNumber),0)+1 AS nextLine FROM orderdetails WHERE orderNumber = {$orderNumber}";
-            $r2 = mysqli_query($connection, $q2);
-            $nextLine = 1;
-            if ($r2 && $row2 = mysqli_fetch_assoc($r2)) {
-                $nextLine = intval($row2['nextLine']);
-            }
+        if (mysqli_num_rows($res_check) > 0) {
+            //caso in cui il prodotto c'e' gia in ordine
+            $row_check = mysqli_fetch_assoc($res_check);
+            $nuovaQuantita = $row_check['quantityOrdered'] + 1;
+            $orderLine = $row_check['orderLineNumber'];
 
-            // inserisco in orderdetails
-            $ins = "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber) VALUES ({$orderNumber}, '{$prodotto_id_esc}', 1, {$priceEach}, {$nextLine})";
-            if (mysqli_query($connection, $ins)) {
-                $message = 'Prodotto aggiunto correttamente all\'ordine.';
+            $upd = "UPDATE orderdetails SET quantityOrdered = $nuovaQuantita, priceEach = $priceEach WHERE orderNumber = $selected_ordine AND productCode = '$prodotto_id'";
+            if (mysqli_query($connection, $upd)) {
+                $message = "Prodotto già presente, quantita presente aumentata";
             } else {
-                $error = 'Errore durante l\'inserimento: ' . mysqli_error($connection);
+                $error = "errore aggiornamento quantita " . mysqli_error($connection);
             }
         } else {
-            $error = 'Prodotto non trovato.';
+
+            // calc orderLineNumber
+            $q2 = mysqli_query($connection, "SELECT MAX(orderLineNumber) FROM orderdetails WHERE orderNumber = $selected_ordine");
+            $row2 = mysqli_fetch_row($q2);  // prende un array numerico
+            $nextLine = ($row2[0] !== null) ? $row2[0] + 1 : 1;
+
+            // inserimento prodotto
+            $ins = "INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
+                    VALUES ($selected_ordine, '$prodotto_id', 1, $priceEach, $nextLine)";
+            if (mysqli_query($connection, $ins)) {
+                $message = "Prodotto è stato aggiunto ";
+            } else {
+                $error = "Errore inserimento: " . mysqli_error($connection);
+            }
         }
     }
 }
 
-$sql_query = "SELECT DISTINCT p.productCode, p.productName FROM products p
-    JOIN orderdetails od ON p.productCode = od.productCode
-    JOIN orders o ON od.orderNumber = o.orderNumber";
+// Lista prodotti
+$sql_query = "SELECT productCode, productName FROM products ORDER BY productName";
 $result = mysqli_query($connection, $sql_query);
-if (!$result) {
-    $error = $error ? $error : ("Query error: " . mysqli_error($connection));
-}
 ?>
 
 <!DOCTYPE html>
