@@ -2,7 +2,7 @@
 session_start();
 require "connection.php";
 
-$customer_id = isset($_GET['customer_id']) && $_GET['customer_id'] !== '' ? intval($_GET['customer_id']) : null;
+$customer_id = $_GET['customer_id'] ?? null;
 
 if ($customer_id) {
     $sql_query = "SELECT orderNumber, customerName FROM orders o JOIN customers c ON o.customerNumber = c.customerNumber WHERE o.customerNumber = {$customer_id} ORDER BY o.orderNumber";
@@ -16,7 +16,7 @@ $num_orders = mysqli_num_rows($result);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['ordine_id'])) {
-        $_SESSION['selected_ordine'] = intval($_POST['ordine_id']);
+        $_SESSION['selected_ordine'] = $_POST['ordine_id'];
     } else {
         unset($_SESSION['selected_ordine']);
     }
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="ordine_id" id="ordine" onchange="this.form.submit()" class="block w-full text-center p-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <option value="">-- Seleziona un ordine --</option>
                     <?php
-                    mysqli_data_seek($result, 0); // // Riporta il puntatore del result set alla prima riga (indice 0)
+                    mysqli_data_seek($result, 0); // riporta il puntatore del result set alla prima riga (indice 0)
                     while ($row = mysqli_fetch_assoc($result)) {
                         $orderNumber = htmlspecialchars($row['orderNumber']);
                         $customerName = htmlspecialchars($row['customerName']);
