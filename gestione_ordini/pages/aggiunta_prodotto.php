@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Lista prodotti
+// lista prodotti
 $sql_query = "SELECT productCode, productName FROM products ORDER BY productName";
 $result = mysqli_query($connection, $sql_query);
 ?>
@@ -112,9 +112,9 @@ $result = mysqli_query($connection, $sql_query);
                 ?>
             </select>
 
-            <noscript>
+            <div>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Aggiungi</button>
-            </noscript>
+            </div>
         </form>
 
     </div>
