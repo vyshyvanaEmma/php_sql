@@ -2,10 +2,13 @@
 session_start();
 require "connection.php";
 $message = null;
-if(!$_SESSION['loggedIn']){
-    $message = 'Utente non è loggatto, quindi non puo inserire il prodotto';
-    header('elenco_ordini.php');
+
+if (!isset($_SESSION['loggedIn']) || $_SESSION['loggedIn'] !== true) {
+    $_SESSION['message'] = 'Utente non è loggato, quindi non può inserire il prodotto';
+    header('Location: login.php');
+    exit();
 }
+
 $orderNumber = isset($_SESSION['selected_ordine']) ? intval($_SESSION['selected_ordine']) : null;
 $selected_ordine = $orderNumber ? htmlspecialchars($orderNumber) : null;
 
